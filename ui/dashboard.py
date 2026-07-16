@@ -10,14 +10,40 @@ import customtkinter as ctk
 from core.theme import PALETTE
 from ui.sidebar import Sidebar
 from ui.pages.inicio import InicioPage
+from ui.pages.catalogo import CatalogoPage
 
 NOMBRES_PAGINA = {
     "venta": "Nueva Venta",
     "clientes": "Cliente",
     "consumo": "Consumo",
-    "producto": "Producto",
-    "sede": "Sede",
-    "estado": "Estado de Ánimo",
+}
+
+# Catálogos de solo lectura: replicación unidireccional, ya locales en el nodo.
+CATALOGOS = {
+    "producto": dict(
+        titulo="Producto", icono="☕",
+        query=(
+            "SELECT id_producto AS ID, nombre AS Nombre, tipo AS Tipo, "
+            "precio AS Precio, id_estado AS [Id Estado] FROM Producto ORDER BY id_producto"
+        ),
+        anchos={"Nombre": 200, "Tipo": 130},
+    ),
+    "sede": dict(
+        titulo="Sede", icono="🏛️",
+        query=(
+            "SELECT id_sede AS ID, nombre AS Nombre, ciudad AS Ciudad, "
+            "direccion AS Direccion FROM Sede ORDER BY id_sede"
+        ),
+        anchos={"Nombre": 160, "Direccion": 260},
+    ),
+    "estado": dict(
+        titulo="Estado de Ánimo", icono="😊",
+        query=(
+            "SELECT id_estado AS ID, nombre AS Nombre, descripcion AS Descripcion "
+            "FROM Estado_Animo ORDER BY id_estado"
+        ),
+        anchos={"Nombre": 150, "Descripcion": 320},
+    ),
 }
 
 
@@ -45,6 +71,8 @@ class Dashboard(ctk.CTkFrame):
 
         if key == "inicio":
             pagina = InicioPage(self.contenido, self.config_data, on_navegar=self.mostrar_pagina)
+        elif key in CATALOGOS:
+            pagina = CatalogoPage(self.contenido, self.config_data, **CATALOGOS[key])
         else:
             pagina = self._crear_placeholder(key)
 
