@@ -132,6 +132,50 @@ def insertar_cliente(config, nombre, apellido, cedula, telefono, correo):
         conn.close()
 
 
+def listar_consumos(config):
+    """
+    Historial de consumos (ambas sedes, porque v_Consumo_Operativo ya es
+    la vista particionada Norte UNION ALL Sur). Se une con Cliente_Operativo
+    y Sede -- ambas tablas físicas locales en cualquier nodo -- solo para
+    mostrar nombres en vez de IDs; no agrega ningún cruce de red adicional
+    más allá del que la propia vista ya hace.
+
+    El total se calcula sumando subtotal de v_Detalle_Consumo (no se toca
+    Consumo_Financiero, que solo vive en Norte).
+    """
+    query = """
+        SELECT
+            c.id_consumo AS ID,
+            cl.nombre + ' ' + cl.apellido AS Cliente,
+            s.nombre AS Sede,
+            c.fecha AS Fecha,
+            (SELECT ISNULL(SUM(d.subtotal), 0)
+             FROM v_Detalle_Consumo d
+             WHERE d.id_consumo = c.id_consumo) AS Total
+        FROM v_Consumo_Operativo c
+        JOIN Cliente_Operativo cl ON cl.id_cliente = c.id_cliente
+        JOIN Sede s ON s.id_sede = c.id_sede
+        ORDER BY c.id_consumo
+    """
+    return ejecutar_query(config, query)
+
+
+def listar_detalle_consumo(config, id_consumo):
+    """Líneas de un consumo específico, con el nombre del producto."""
+    query = """
+        SELECT
+            d.id_linea AS Linea,
+            p.nombre AS Producto,
+            d.cantidad AS Cantidad,
+            d.subtotal AS Subtotal
+        FROM v_Detalle_Consumo d
+        JOIN Producto p ON p.id_producto = d.id_producto
+        WHERE d.id_consumo = ?
+        ORDER BY d.id_linea
+    """
+    return ejecutar_query(config, query, params=[id_consumo])
+
+
 def obtener_stats_inicio(config):
     """
     Estadísticas de la pantalla de Inicio, calculadas SIEMPRE sobre la sede

@@ -12,10 +12,10 @@ from ui.sidebar import Sidebar
 from ui.pages.inicio import InicioPage
 from ui.pages.catalogo import CatalogoPage
 from ui.pages.cliente import ClientePage
+from ui.pages.consumo import ConsumoPage
 
 NOMBRES_PAGINA = {
     "venta": "Nueva Venta",
-    "consumo": "Consumo",
 }
 
 # Catálogos de solo lectura: replicación unidireccional, ya locales en el nodo.
@@ -73,6 +73,8 @@ class Dashboard(ctk.CTkFrame):
             pagina = InicioPage(self.contenido, self.config_data, on_navegar=self.mostrar_pagina)
         elif key == "clientes":
             pagina = ClientePage(self.contenido, self.config_data)
+        elif key == "consumo":
+            pagina = ConsumoPage(self.contenido, self.config_data)
         elif key in CATALOGOS:
             pagina = CatalogoPage(self.contenido, self.config_data, **CATALOGOS[key])
         else:
