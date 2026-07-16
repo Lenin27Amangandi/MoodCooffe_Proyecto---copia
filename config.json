@@ -1,0 +1,22 @@
+{
+  "nodos": {
+    "XANDER27HALF": {
+      "sede_id": 1,
+      "sede_nombre": "Sede Norte",
+      "base_local": "MoodCoffee_DBNorte",
+      "usuario_local": "sa",
+      "clave_local": "P@ssw0rd",
+      "instancia_remota": "DXCAM",
+      "base_remota": "MoodCoffee_DBSur"
+    },
+    "DXCAM": {
+      "sede_id": 2,
+      "sede_nombre": "Sede Sur",
+      "base_local": "MoodCoffee_DBSur",
+      "usuario_local": "sa",
+      "clave_local": "sql123",
+      "instancia_remota": "XANDER27HALF",
+      "base_remota": "MoodCoffee_DBNorte"
+    }
+  }
+}
