@@ -132,6 +132,64 @@ def insertar_cliente(config, nombre, apellido, cedula, telefono, correo):
         conn.close()
 
 
+def insertar_fila(config, tabla, columnas, valores):
+    """
+    Inserta una fila genérica. 'tabla' y 'columnas' SIEMPRE vienen de
+    constantes internas (core/catalogos_meta.py), nunca de texto libre
+    del usuario -- por eso el f-string de nombres es seguro. Los VALORES
+    sí van parametrizados con '?' para evitar inyección SQL.
+    """
+    conn = get_local_connection(config)
+    try:
+        cursor = conn.cursor()
+        cols_sql = ", ".join(columnas)
+        placeholders = ", ".join(["?"] * len(valores))
+        cursor.execute(f"INSERT INTO {tabla} ({cols_sql}) VALUES ({placeholders})", *valores)
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def actualizar_fila(config, tabla, pk_columna, pk_valor, columnas, valores):
+    conn = get_local_connection(config)
+    try:
+        cursor = conn.cursor()
+        set_sql = ", ".join([f"{c} = ?" for c in columnas])
+        cursor.execute(f"UPDATE {tabla} SET {set_sql} WHERE {pk_columna} = ?", *valores, pk_valor)
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def eliminar_fila(config, tabla, pk_columna, pk_valor):
+    conn = get_local_connection(config)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(f"DELETE FROM {tabla} WHERE {pk_columna} = ?", pk_valor)
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def existe_id(config, tabla, pk_columna, pk_valor):
+    conn = get_local_connection(config)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT COUNT(*) FROM {tabla} WHERE {pk_columna} = ?", pk_valor)
+        return cursor.fetchone()[0] > 0
+    finally:
+        conn.close()
+
+
 def listar_consumos(config):
     """
     Historial de consumos (ambas sedes, porque v_Consumo_Operativo ya es

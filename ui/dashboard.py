@@ -1,49 +1,20 @@
 """
 Contenedor principal tras el login: Sidebar + área de contenido.
-Solo "Inicio" está completamente implementado con datos reales por
-ahora; el resto de páginas del menú muestran un placeholder hasta que
-construyamos su CRUD (ver roadmap del proyecto).
+"Nueva Venta" sigue como placeholder hasta el último paso del roadmap.
 """
 
 import customtkinter as ctk
 
 from core.theme import PALETTE
+from core.catalogos_meta import CATALOGOS_META
 from ui.sidebar import Sidebar
 from ui.pages.inicio import InicioPage
-from ui.pages.catalogo import CatalogoPage
 from ui.pages.cliente import ClientePage
 from ui.pages.consumo import ConsumoPage
+from ui.pages.crud_catalogo import CrudCatalogoPage
 
 NOMBRES_PAGINA = {
     "venta": "Nueva Venta",
-}
-
-# Catálogos de solo lectura: replicación unidireccional, ya locales en el nodo.
-CATALOGOS = {
-    "producto": dict(
-        titulo="Producto", icono="☕",
-        query=(
-            "SELECT id_producto AS ID, nombre AS Nombre, tipo AS Tipo, "
-            "precio AS Precio, id_estado AS [Id Estado] FROM Producto ORDER BY id_producto"
-        ),
-        anchos={"Nombre": 200, "Tipo": 130},
-    ),
-    "sede": dict(
-        titulo="Sede", icono="🏛️",
-        query=(
-            "SELECT id_sede AS ID, nombre AS Nombre, ciudad AS Ciudad, "
-            "direccion AS Direccion FROM Sede ORDER BY id_sede"
-        ),
-        anchos={"Nombre": 160, "Direccion": 260},
-    ),
-    "estado": dict(
-        titulo="Estado de Ánimo", icono="😊",
-        query=(
-            "SELECT id_estado AS ID, nombre AS Nombre, descripcion AS Descripcion "
-            "FROM Estado_Animo ORDER BY id_estado"
-        ),
-        anchos={"Nombre": 150, "Descripcion": 320},
-    ),
 }
 
 
@@ -75,8 +46,8 @@ class Dashboard(ctk.CTkFrame):
             pagina = ClientePage(self.contenido, self.config_data)
         elif key == "consumo":
             pagina = ConsumoPage(self.contenido, self.config_data)
-        elif key in CATALOGOS:
-            pagina = CatalogoPage(self.contenido, self.config_data, **CATALOGOS[key])
+        elif key in CATALOGOS_META:
+            pagina = CrudCatalogoPage(self.contenido, self.config_data, CATALOGOS_META[key])
         else:
             pagina = self._crear_placeholder(key)
 
