@@ -11,10 +11,10 @@ from core.theme import PALETTE
 from ui.sidebar import Sidebar
 from ui.pages.inicio import InicioPage
 from ui.pages.catalogo import CatalogoPage
+from ui.pages.cliente import ClientePage
 
 NOMBRES_PAGINA = {
     "venta": "Nueva Venta",
-    "clientes": "Cliente",
     "consumo": "Consumo",
 }
 
@@ -71,6 +71,8 @@ class Dashboard(ctk.CTkFrame):
 
         if key == "inicio":
             pagina = InicioPage(self.contenido, self.config_data, on_navegar=self.mostrar_pagina)
+        elif key == "clientes":
+            pagina = ClientePage(self.contenido, self.config_data)
         elif key in CATALOGOS:
             pagina = CatalogoPage(self.contenido, self.config_data, **CATALOGOS[key])
         else:
